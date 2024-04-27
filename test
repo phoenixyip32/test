@@ -1,0 +1,1129 @@
+#include <algorithm>
+#include <chrono>
+#include<cstdio>
+#include <ctime>
+#include <iomanip> 
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <vector>
+#include<Windows.h>
+
+#define qdo 262
+#define qre 294
+#define qmi 330     //q前缀为低音，1后缀为高音，s前缀为半音阶
+#define qfa 349
+#define qso 392
+#define qla 440
+#define qsi 494
+#define do 523
+#define re 578
+#define mi 659
+#define fa 698
+#define so 784
+#define la 880
+#define si 988
+#define do1 1046
+#define re1 1175
+#define mi1 1318
+#define fa1 1480
+#define so1 1568
+#define la1 1760
+#define si1 1976
+#define sqdo 277
+#define sqre 311
+#define sqfa 370
+#define sqso 415
+#define sqla 466
+#define sdo 554
+#define sre 622
+#define sfa 740
+#define sso 831
+#define sla 932
+#define sdo1 1046
+#define sre1 1245
+#define sfa1 1480
+#define sso1 1661
+#define sla1 1865
+
+using namespace std;
+std::string getCurrentTime() {
+    // Get current time from the system clock
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+    // Convert to local time
+    std::tm localTime{};
+    localtime_s(&localTime, &now_c);  // Use localtime_s on Windows, for POSIX use localtime_r
+
+    // Format the time as a string
+    std::stringstream ss;
+    ss << std::put_time(&localTime, "%d-%m-%Y");  // Format: YYYY-MM-DD HH:MM:SS
+    return ss.str();
+}
+
+class Customer {
+private:
+    string customerID;
+    char rank;
+    int pointsBalance;
+
+public:
+    Customer(string id, char r, int balance) {
+        customerID = id;
+        rank = r;
+        pointsBalance = balance;
+    }
+
+    string getCustomerID() const { return customerID; }
+    char getRank() const { return rank; }
+    int getPointsBalance() const { return pointsBalance; }
+
+    void setRank(char newRank) { rank = newRank; }
+    void setPointsBalance(int newBalance) { pointsBalance = newBalance; }
+
+    void displayCustomerInfo() const {
+        cout << "Customer ID: " << customerID << endl;
+        cout << "Rank: " << rank << endl;
+        cout << "Points Balance: " << pointsBalance << endl;
+    }
+
+
+    void addPoints(int points) {
+        pointsBalance += points;
+        cout << points << " points added. New balance: " << pointsBalance << endl;
+    }
+
+    void deductPoints(int points) {
+        if (pointsBalance >= points) {
+            pointsBalance -= points;
+            cout << points << " points deducted. New balance: " << pointsBalance << endl;
+        }
+        else {
+            cout << "Not enough points to deduct." << endl;
+        }
+    }
+};
+int findcustomer(vector<Customer>& customer, string a) {
+    for (int i = 0; i < customer.size(); i++) {
+        if (customer[i].getCustomerID() == a)
+        {
+            return{ i };
+        }
+    }
+}
+class Gift {
+private:
+    string giftID, Category;
+    string description;
+    int price;
+    int pointsRequired;
+
+public:
+
+    Gift(string id, string desc, int pr, int points) {
+        giftID = id; description = desc;
+        price = pr;
+        pointsRequired = points;
+    }
+
+    string getGiftID() const { return giftID; }
+    string getDescription() const { return description; }
+    int getPrice() const { return price; }
+    int getPointsRequired() const { return pointsRequired; }
+
+    void setDescription(string newDescription) { description = newDescription; }
+    void setPrice(int newPrice) { price = newPrice; }
+    void setPointsRequired(int newPoints) { pointsRequired = newPoints; }
+
+    void displayGiftInfo() const {
+        cout << "Gift ID: " << giftID << endl;
+        cout << "Description: " << description << endl;
+        cout << "Price: HKD " << price << endl;
+        cout << "Points Required: " << pointsRequired << endl;
+    }
+    string getCategory() {
+        return Category;
+    }
+};
+int findgift(vector<Gift>& customer, string a) {
+    for (int i = 0; i < customer.size(); i++) {
+        if (customer[i].getGiftID() == a)
+        {
+            return{ i };
+        }
+    }
+}
+class Transaction {
+public:
+    Transaction(const string& id, const string& t, int p, const string& d) {
+        customerID = id;
+        type = t;
+        points = p;
+        details = d;
+        time = getCurrentTime();
+    }
+    string gettargetc() { return customerID; }
+    string gettargety() { return type; }
+    int gettargetp() { return points; }
+    string gettargett() { return time; }
+    void display() const {
+        cout << "Type: " << type << ", Points: " << points << ", Details: " << details << endl;
+    }
+
+
+
+private:
+    string customerID;
+    string type;
+    int points;
+    string details;
+    string time;
+
+
+};
+void showtransaction(vector<Customer>& customer, vector<Transaction>& transaction, int a) {
+    for (int i = 0; i < customer.size(); i++) {
+        if (transaction.at(i).gettargetc() == customer.at(a).getCustomerID())
+        {
+            transaction.at(i).display();
+        }
+    }
+}
+void display_loading_bar(string a) {
+    int delay = 1000;
+    const int total_ticks = 10;
+    cout << "loading data " << a << "... " << "\n";
+    for (int i = 0; i <= total_ticks; ++i) {
+        std::cout << "\r" // Move cursor to the beginning of the line
+            << "[";
+
+        // Display completed ticks
+        for (int tick = 0; tick < i; ++tick) {
+            std::cout << "I";
+        }
+
+        // Display remaining ticks
+        for (int tick = i; tick < total_ticks; ++tick) {
+            std::cout << " ";
+        }
+
+        std::cout << "] " << i * 10 << "%"; // Display percentage
+
+        std::cout.flush(); // Ensure the output is displayed
+
+        // Wait before next tick
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    }
+    std::cout << "\n" << "\n" << std::endl;
+
+}
+bool isLeapYear(int year) {
+    return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0));
+}
+
+bool isValidDate(int day, int month, int year) {
+    if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31)
+        return false;
+
+    if (month == 2) {
+        if (isLeapYear(year))
+            return day <= 29;
+        else
+            return day <= 28;
+    }
+
+    if (month == 4 || month == 6 || month == 9 || month == 11)
+        return day <= 30;
+
+    return true;
+}
+
+
+void loadData(vector<Gift>& gifts, vector<Customer>& customers) {
+    bool load_data = true;
+    if (load_data) {
+        gifts.clear();
+        customers.clear();
+        string x = "gifts";
+        display_loading_bar(x);
+        gifts.emplace_back("A01", "LG Internet TV", 3900, 19000);
+        gifts.emplace_back("A02", "Pioneer Hifi Set", 2400, 11500);
+        gifts.emplace_back("A03", "Sony DVD Player", 400, 2000);
+        gifts.emplace_back("B01", "Healthy Air Fryer", 1500, 7300);
+        gifts.emplace_back("B02", "Tefal Microwave Oven", 480, 2400);
+        gifts.emplace_back("B03", "Famous Coffee Maker", 1800, 8800);
+        gifts.emplace_back("B04", "Smart Rice Cooker", 600, 2900);
+        gifts.emplace_back("B05", "TechCook Toaster Oven", 450, 2250);
+        gifts.emplace_back("C01", "Wellcome $50 Coupon", 50, 250);
+        gifts.emplace_back("C02", "Mannings $50 Coupon", 50, 250);
+        gifts.emplace_back("C03", "Wellcome $50 Coupon", 100, 500);
+        gifts.emplace_back("C04", "Shell $200 Coupon ", 200, 960);
+        gifts.emplace_back("D01", "Clever Headset", 350, 1750);
+        gifts.emplace_back("D02", "HP Optic Mouse", 250, 1250);
+        gifts.emplace_back("D03", "Stylish Bluetooth Speaker", 800, 3900);
+        string y = "customer";
+        display_loading_bar(y);
+        customers.emplace_back("Tommy2015", 'B', 8500);
+        customers.emplace_back("DavidChan", 'B', 22800);
+        customers.emplace_back("Luna123", 'B', 650);
+        customers.emplace_back("TigerMan", 'B', 14000);
+        customers.emplace_back("Max5678", 'S', 2580);
+        customers.emplace_back("Neo2000", 'S', 8000);
+        customers.emplace_back("CCTang", 'S', 33554);
+        customers.emplace_back("EchoWong", 'G', 8650);
+        customers.emplace_back("Rubychow", 'G', 28000);
+        customers.emplace_back("Ivy2023", 'G', 12340);
+        load_data = false;
+        cout << "Finish load data";
+    }
+};
+void showRecords(const vector<Gift>& gifts, const vector<Customer>& customers) {
+
+    vector<Gift> sortedGifts = gifts;
+    sort(sortedGifts.begin(), sortedGifts.end(), [](const Gift& a, const Gift& b) {
+        return a.getGiftID() < b.getGiftID();
+        });
+
+    vector<Customer> sortedCustomers = customers;
+    sort(sortedCustomers.begin(), sortedCustomers.end(), [](const Customer& a, const Customer& b) {
+        return a.getCustomerID() < b.getCustomerID();
+        });
+
+    cout << "\nGift Records:\n";
+    cout << left << setw(10) << "Gift ID" << setw(30) << "Description" << setw(10) << "Price" << setw(15) << "Points Required" << endl;
+    for (const auto& gift : sortedGifts) {
+        cout << left << setw(10) << gift.getGiftID() << setw(30) << gift.getDescription()
+            << setw(10) << gift.getPrice() << setw(15) << gift.getPointsRequired() << endl;
+    }
+
+    cout << "\nCustomer Records:\n";
+    cout << left << setw(15) << "Customer ID" << setw(10) << "Rank" << setw(15) << "Points Balance" << endl;
+    for (const auto& customer : sortedCustomers) {
+        cout << left << setw(15) << customer.getCustomerID() << setw(10) << customer.getRank()
+            << setw(15) << customer.getPointsBalance() << endl;
+    }
+}
+
+int findCustomerIndex(const vector<Customer>& customers, const string& id) {
+    for (int i = 0; i < customers.size(); ++i) {
+        if (customers[i].getCustomerID() == id) {
+            return i;
+        }
+    }
+    return -1;
+}
+bool parseDate(const std::string& dateJoined, int& day, int& month, int& year) {
+    std::istringstream dateStream(dateJoined);
+    std::string token;
+
+    // Get day
+    if (!std::getline(dateStream, token, '/')) return false;
+    day = std::stoi(token);
+
+    // Get month
+    if (!std::getline(dateStream, token, '/')) return false;
+    month = std::stoi(token);
+
+    // Get year
+    if (!std::getline(dateStream, token, '/')) return false;
+    year = std::stoi(token);
+
+    // Extra check: there should be no additional data in the string
+    if (std::getline(dateStream, token)) return false;
+
+    return true; // Successful parsing
+}
+char getMembershipRank(int yearJoined, int monthJoined) {
+    // Get the current date from the system clock
+    auto now = std::chrono::system_clock::now();
+    auto now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm localTime{};
+    localtime_s(&localTime, &now_c); // For POSIX, replace with localtime_r(&now_c, &localTime);
+
+    int currentYear = localTime.tm_year + 1900; // tm_year is years since 1900
+    int currentMonth = localTime.tm_mon + 1;    // tm_mon is months since January [0-11]
+
+    int yearsOfMembership = currentYear - yearJoined;
+    int monthsOfMembership = (currentMonth - monthJoined) + yearsOfMembership * 12;
+
+    if (monthsOfMembership >= 12) {
+        return 'G'; // Gold
+    }
+    else if (monthsOfMembership >= 6) {
+        return 'S'; // Silver
+    }
+    else {
+        return 'B'; // Bronze
+    }
+}
+
+void editCustomers(vector<Customer>& customers) {
+
+    string customerID;
+    int day, month, year;
+    cout << "Enter Customer ID: ";
+    cin >> customerID;
+
+    int index = findCustomerIndex(customers, customerID);
+
+    if (index != -1) {
+        cout << "Customer found. Details:" << endl;
+        customers[index].displayCustomerInfo();
+
+        char confirm;
+        cout << "Confirm delete? (Y/N): ";
+        cin >> confirm;
+
+        if (confirm == 'Y' || confirm == 'y') {
+            customers.erase(customers.begin() + index);
+            cout << "Customer deleted successfully." << endl;
+        }
+        else {
+            cout << "Delete operation cancelled." << endl;
+        }
+    }
+    else {
+        string dateJoined;
+        int points;
+        bool check = true;
+        while (check) {
+            cout << "Enter date joined (DD/MM/YYYY): ";
+            cin >> dateJoined;
+            if (parseDate(dateJoined, day, month, year)) {
+                check = isValidDate(day, month, year);
+                if (check = false) {
+                    cout << "the date is wrong";
+                }
+            }
+            else {
+                std::cout << "Invalid date format entered." << std::endl;
+                check = false;
+            }
+
+        }
+
+        cout << "Enter initial points balance: ";
+        cin >> points;
+        char rank = getMembershipRank(year, month);
+
+
+        customers.push_back(Customer(customerID, rank, points));
+        cout << "New customer added successfully." << endl;
+    }
+}
+void customerA1(vector<Customer>& customer, vector<Transaction>& transaction, int a) {
+    float amount;
+    cout << "Enter amount spent: ";
+    cin >> amount;
+    int points = static_cast<int>(amount / 250);
+    customer.at(a).addPoints(points);
+    transaction.emplace_back(customer.at(a).getCustomerID(), "add", points, "");
+}
+
+bool compareGifts(const Gift& a, const Gift& b) {
+    return a.getPointsRequired() < b.getPointsRequired();
+}
+
+void customerA2(vector<Gift>& vGift, vector<Customer>& vCustomer, int customerId)
+{
+    int retries = 0;
+    bool validInput = true;
+    int adjustedPoints = -1;
+
+    char rank = vCustomer[customerId].getRank();
+    float discount;
+    if (rank == 'G') {
+        discount = 0.1;
+    }
+    else if (rank == 'S') {
+        discount = 0.05;
+    }
+    else {
+        discount = 0.00;
+    }
+
+
+
+    string Type;
+    cout << "Please enter the category of the gift: ";
+    cin >> Type;
+
+    vector<Gift> filteredGifts;
+    for (int i = 0; i < vGift.size(); i++) {
+        if (vGift[i].getCategory() == Type) {
+            filteredGifts.push_back(vGift[i]);
+        }
+    }
+    std::sort(filteredGifts.begin(), filteredGifts.end(), compareGifts);
+
+    cout << "Available gifts for category " << Type << " are listed below: " << endl;
+    for (int i = 0; i < filteredGifts.size(); i++) {
+        adjustedPoints = roundf(filteredGifts[i].getPointsRequired() * (1 - discount));
+        cout << "Gift " << filteredGifts[i].giftID() << ": " << endl;
+        filteredGifts[i].printGiftDetails();
+        cout << "Adjusted Required Points: " << adjustedPoints << endl;
+        cout << "--------------------------------" << endl;
+
+    }
+    do {
+        cout << "Enter the ID of the gift you want to redeem: ";
+        string giftID;
+        cin >> giftID;
+
+        int giftIndex = -1;
+        for (int i = 0; i < filteredGifts.size(); i++) {
+            if (filteredGifts[i].getID() == giftID) {
+                giftIndex = i;
+                break;
+            }
+        }
+
+        if (giftIndex == -1) {
+            cout << "Invalid gift ID." << endl;
+            validInput = false;
+        }
+
+        else {
+
+            validInput = true;
+            int prices = roundf(filteredGifts[giftIndex].getPrice());
+            adjustedPoints = roundf(filteredGifts[giftIndex].getPoint() * (1 - discount));
+            cout << "Enter the number of CC points you want to use: ";
+            int userPoints;
+            cin >> userPoints;
+
+            if (userPoints > vCustomer[customerId].getPointsBalance()) {
+                cout << "You do not have enough CC points." << endl;
+                validInput = false;
+                retries++;
+            }
+
+            else if (userPoints < adjustedPoints) {
+                float extraAmount = prices - userPoints * 0.2;
+                cout << "You will need an extra " << extraAmount << " to redeem this gift." << endl;
+
+                cout << "Do you confirm this transaction? (Yes/No) ";
+                string confirm;
+                cin >> confirm;
+
+                if (confirm == "Yes" || confirm == "yes") {
+                    vCustomer[customerId].addPoints(-userPoints);
+                    cout << "Transaction successful. Your new CC points balance is " << vCustomer[customerId].getPointsBalance() << "." << endl;
+                }
+                else {
+                    cout << "Transaction cancelled." << endl;
+                    validInput = true;
+                    retries = 0;
+                }
+            }
+
+            else {
+                vCustomer[customerId].addPoints(-adjustedPoints);
+                cout << "Transaction successful. Your new CC points balance is " << vCustomer[customerId].getPointsBalance() << "." << endl;
+                validInput = true;
+                retries = 0;
+            }
+        }
+
+        if (!validInput) {
+            retries++;
+
+            if (retries <= 2) {
+                cout << "Invalid Input. Please try again." << endl;
+            }
+            else {
+                cout << "Invalid Input. Returning to main menu." << endl;
+                return;
+            }
+        }
+
+    } while (!validInput && retries <= 2);
+}
+
+void customerA3(vector<Customer>& customer, vector<Transaction>& transaction, int a) {
+    int newBalance;
+    cout << "Enter new points balance: ";
+    cin >> newBalance;
+    customer.at(a).setPointsBalance(newBalance);
+    cout << "Points balance updated to " << newBalance << endl;
+    transaction.emplace_back(customer.at(a).getCustomerID(), "set", newBalance, "set point");
+}
+
+void customerView(vector<Customer>& customer, vector<Transaction>& transaction, vector<Gift>& vGift) {
+    int x = 0;
+    char option = ' ';
+    string customerID;
+
+    cout << "customerid : ";
+    cin >> customerID;
+    x = findCustomerIndex(customer, customerID);
+    if (x != -1) {
+        while (option != '4') {
+            cout << "\nAction for Customer ID: " << endl;
+            cout << " Customer View Menu  " << endl;
+            cout << "[1] Earn CC Points" << endl;
+            cout << "[2] Redeem Gifts" << endl;
+            cout << "[3] Modify CC Points Balance  " << endl;
+            cout << "[4] Return to Main Menu" << endl;
+            cout << "**" << endl;
+            cout << "Option (1 - 4): ";
+            cin >> option;
+
+            switch (option) {
+            case '1': customerA1(customer, transaction, x); break;
+            case '2': customerA2(customer, transaction, vGift, x); break;
+            case '3': customerA3(customer, transaction, x); break;
+            case '4': break;
+            default:
+                cout << "No such option " << option << endl;
+                break;
+            }
+
+        }
+    }
+    else {
+        cout << "We cannot find your customer ID.\n";
+        cout << "Return to Main Menu.\n";
+    }
+
+}
+/*void earnCCPoints(Customer& customer) {
+    float amountSpent;
+    cout << "Enter amount spent to earn points: ";
+    cin >> amountSpent;
+    int points = static_cast<int>(amountSpent / 250);
+    customer.addPoints(points);
+    cout << "Points earned: " << points << ". Total points: " << customer.getPointsBalance() << endl;
+}
+
+void redeemGifts(vector<Customer>&customer, const std::vector<Gift>& gifts,int a) {
+    cout << "Available gifts for redemption:\n";
+    for (const auto& gift : gifts) {
+        int discount = (customer.at(a).getRank() == 'G') ? 10 : (customer.at(a).getRank() == 'S' ? 5 : 0);
+        int requiredPoints = gift.getPointsRequired() - (gift.getPointsRequired() * discount / 100);
+        std::cout << gift.getGiftID() << ": " << gift.getDescription() << " - Points required: " << requiredPoints << std::endl;
+    }
+
+    std::string giftID;
+    std::cout << "Enter Gift ID to redeem: ";
+    std::cin >> giftID;
+
+    auto it = std::find_if(gifts.begin(), gifts.end(), [&giftID](const Gift& g) { return g.getGiftID() == giftID; });
+    if (it != gifts.end()) {
+        int discount = (customer.at(a).getRank() == 'G') ? 10 : (customer.at(a).getRank() == 'S' ? 5 : 0);
+        int requiredPoints = it->getPointsRequired() - (it->getPointsRequired() * discount / 100);
+        if (customer.at(a).getPointsBalance() >= requiredPoints) {
+            customer.at(a).deductPoints(requiredPoints);
+            std::cout << "Gift redeemed successfully. Remaining points: " << customer.at(a).getPointsBalance() << std::endl;
+        }
+        else {
+            std::cout << "Not enough points to redeem this gift." << std::endl;
+        }
+    }
+    else {
+        std::cout << "Invalid Gift ID entered." << std::endl;
+    }
+}
+
+void modifyCCPoints(vector<Customer>& customer) {
+    int newBalance;
+    std::cout << "Current Points Balance: " << customer.at(0).getPointsBalance() << std::endl;
+    std::cout << "Enter new points balance: ";
+    std::cin >> newBalance;
+    customer.at(0).setPointsBalance(newBalance);
+    std::cout << "New Points Balance: " << customer.at(0).getPointsBalance() << std::endl;
+}*/
+
+void showTransactionHistory(vector<Transaction>& transaction, vector<Customer>& customer) {
+    char option;
+    cout << "watch all customer Transaction or the specific one?(y/n) ";
+    cin >> option;
+    if (option == 'Y' || option == 'y') {
+        for (int i = 0; i < transaction.size(); i++) {
+            transaction.at(i).display();
+        }
+
+
+    }
+    else
+        if (option == 'N' || option == 'n') {
+            string x;
+            bool otheruser = true;
+            char check;
+            while (true) {
+                cout << "userid : ";
+                cin >> x;
+                showtransaction(customer, transaction, findcustomer(customer, x));
+                cout << "Check Other User ? (Y/N) ";
+                cin >> check;
+                if (check == 'Y' || check == 'y') {
+
+                }
+                else if (check == 'N' || check == 'n') {
+                    break;
+                }
+                else {
+                    cout << "Invalid option y(Y) or n(N) only, please try again.";
+                }
+
+
+            };
+
+        }
+        else
+            cout << "Invalid option y(Y) or n(N) only, please try again.";
+
+
+}
+
+int creditsAndExit() {
+    char exit = 'n';
+    cout << "Are you sure to exit? (Y/N)\n";
+    cin >> exit;
+
+    if (exit == 'Y' || exit == 'y') {
+        cout << "(student name, student ID, tutorial group)";
+        return 1;
+    }
+    else
+        if (exit == 'N' || exit == 'n') {
+            return 0;
+        }
+        else
+            return creditsAndExit();
+
+
+};
+void song() {
+    cout << "frienly reminder please turn your headphone lower " << "\n" << "yuors";
+    cout << "\n" << "after 1000 tick will play the music";
+    Sleep(1000);
+    int pai = 400, ban = 200;
+    int ting = 128;
+    Sleep(1000);
+    Beep(la, ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai + ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(si, 3 * pai);
+    Sleep(ting);
+    Beep(mi, ban);
+    Beep(mi, ban);
+    Beep(la, ban + pai);
+    Beep(so, ban);
+    Sleep(ting);
+    Beep(la, pai);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(so, 2 * pai);
+    Sleep(ting);
+    Sleep(pai);
+    Beep(mi, ban);
+    Sleep(ting / 2);
+    Beep(mi, ban);
+    Sleep(ting / 2);
+    Beep(fa, pai + ban);
+    Beep(mi, ban);
+    Sleep(ting);
+    Beep(fa, ban);
+    Beep(do1, ban + pai);
+    Sleep(ting);
+    Beep(mi, 2 * pai);
+    Sleep(ting);
+    Sleep(ban);
+    Beep(do1, ban);
+    Sleep(ting / 2);
+    Beep(do1, ban);
+    Sleep(ting / 2);
+    Beep(do1, ban);
+    Sleep(ting / 2);
+    Beep(si, ban + pai);
+    Beep(sfa, ban);
+    Sleep(ting);
+    Beep(sfa, pai);
+    Beep(si, pai);
+    Sleep(ting);
+    Beep(si, 2 * pai);
+    Sleep(ting);
+    Sleep(pai);
+    Beep(la, ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai + ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(si, 2 * pai);
+    Sleep(ting);
+    Sleep(pai);
+    Beep(mi, ban);
+    Sleep(20);
+    Beep(mi, ban);
+    Sleep(ting);
+    Beep(la, pai + ban);
+    Beep(so, ban);
+    Sleep(ting);
+    Beep(la, pai);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(so, 3 * pai);
+    Sleep(ting + ban);
+    Beep(mi, ban);
+    Sleep(ting / 2);
+    Beep(fa, pai);
+    Sleep(ting);
+    Beep(do1, ban);
+    Beep(si, ban);
+    Sleep(20);
+    Beep(si, pai);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(re1, ban);
+    Sleep(20);
+    Beep(re1, ban);
+    Sleep(20);
+    Beep(mi1, ban);
+    Sleep(ting / 2);
+    Beep(do1, pai);
+    Sleep(ting + pai);
+    Beep(do1, pai);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(la, ban);
+    Sleep(20);
+    Beep(la, ban);
+    Sleep(ting);
+    Beep(si, pai);
+    Sleep(ting);
+    Beep(sso, pai);
+    Sleep(ting);
+    Beep(sso, 2 * pai);
+    Sleep(ting + pai);
+    Beep(do1, ban);
+    Beep(re1, ban);
+    Sleep(ting);
+    Beep(mi1, pai + ban);
+    Beep(re1, ban);
+    Sleep(ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(fa1, pai);
+    Sleep(ting);
+    Beep(re1, 2 * pai);
+    Sleep(pai + ting);
+    Beep(so, ban);
+    Sleep(20);
+    Beep(so, ban);
+    Sleep(ting);
+    Beep(do1, ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(mi1, 2 * pai);
+    Sleep(ting + 2 * pai);
+    Beep(la, ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(si, pai);
+    Sleep(ting);
+    Beep(re1, ban);
+    Sleep(20);
+    Beep(re1, ban);
+    Sleep(ting);
+    Beep(do1, pai + ban);
+    Beep(so, ban);
+    Sleep(20);
+    Beep(so, pai);
+    Sleep(pai + ting);
+    Beep(fa1, pai);
+    Sleep(ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(re1, pai);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(mi1, 4 * pai);
+    Beep(mi1, pai * 2);
+    Sleep(pai + ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(la1, 2 * pai);
+    Sleep(ting);
+    Beep(so1, pai);
+    Sleep(ting);
+    Beep(so1, pai);
+    Sleep(ting);
+    Beep(mi1, ban);
+    Sleep(ting / 2);
+    Beep(re1, ban);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting + ban);
+    Beep(do1, ban);
+    Sleep(ting);
+    Beep(re1, pai);
+    Sleep(ting);
+    Beep(do1, ban);
+    Beep(re1, ban);
+    Sleep(20);
+    Beep(re1, ban);
+    Sleep(ting);
+    Beep(so1, pai);
+    Sleep(ting);
+    Beep(mi1, 2 * pai);
+    Sleep(ting + pai);
+    Beep(mi, pai);
+    Sleep(ting);
+    Beep(la1, 2 * pai);
+    Sleep(ting);
+    Beep(so1, 2 * pai);
+    Sleep(ting);
+    Beep(mi1, ban);
+    Beep(re1, ban);
+    Sleep(ting);
+    Beep(do1, 2 * pai);
+    Sleep(ting + ban);
+    Beep(do1, ban);
+    Sleep(ting);
+    Beep(re1, pai);
+    Sleep(ting);
+    Beep(do1, ban);
+    Beep(re1, ban);
+    Sleep(20);
+    Beep(re1, ban);
+    Sleep(ting);
+    Beep(si, pai);
+    Sleep(ting);
+    Beep(la, 2 * pai);
+    Sleep(ting);
+    Beep(la, ban);
+    Beep(si, ban);
+    Beep(do1, pai + ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(si, 3 * pai);
+    Sleep(ting);
+    Beep(mi, ban);
+    Beep(mi, ban);
+    Beep(la, ban + pai);
+    Beep(so, ban);
+    Sleep(ting);
+    Beep(la, pai);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(so, 2 * pai);
+    Sleep(ting);
+    Sleep(pai);
+    Beep(mi, ban);
+    Sleep(ting / 2);
+    Beep(mi, ban);
+    Sleep(ting / 2);
+    Beep(fa, pai + ban);
+    Beep(mi, ban);
+    Sleep(ting);
+    Beep(fa, ban);
+    Beep(do1, ban + pai);
+    Sleep(ting);
+    Beep(mi, 2 * pai);
+    Sleep(ting);
+    Sleep(ban);
+    Beep(do1, ban);
+    Sleep(ting / 2);
+    Beep(do1, ban);
+    Sleep(ting / 2);
+    Beep(do1, ban);
+    Sleep(ting / 2);
+    Beep(si, ban + pai);
+    Beep(sfa, ban);
+    Sleep(ting);
+    Beep(sfa, pai);
+    Beep(si, pai);
+    Sleep(ting);
+    Beep(si, 2 * pai);
+    Sleep(ting);
+    Sleep(pai);
+    Beep(la, ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai + ban);
+    Beep(si, ban);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(mi1, pai);
+    Sleep(ting);
+    Beep(si, 2 * pai);
+    Sleep(ting);
+    Sleep(pai);
+    Beep(mi, ban);
+    Sleep(20);
+    Beep(mi, ban);
+    Sleep(ting);
+    Beep(la, pai + ban);
+    Beep(so, ban);
+    Sleep(ting);
+    Beep(la, pai);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(so, 3 * pai);
+    Sleep(ting + ban);
+    Beep(mi, ban);
+    Sleep(ting / 2);
+    Beep(fa, pai);
+    Sleep(ting);
+    Beep(do1, ban);
+    Beep(si, ban);
+    Sleep(20);
+    Beep(si, pai);
+    Sleep(ting);
+    Beep(do1, pai);
+    Sleep(ting);
+    Beep(re1, ban);
+    Sleep(20);
+    Beep(re1, ban);
+    Sleep(20);
+    Beep(mi1, ban);
+    Sleep(ting / 2);
+    Beep(do1, pai);
+    Sleep(ting + pai);
+    Beep(la, 4 * pai);
+    Sleep(1000);
+
+}
+void  creative() {
+    int option;
+    cout << "\nAction for Customer ID: " << endl;
+    cout << " Customer View Menu  " << endl;
+    cout << "[1] c++ painting" << endl;
+    cout << "[2] c++ song" << endl;
+    cout << "[3] Modify CC Points Balance  " << endl;
+    cout << "[4] Return to Main Menu" << endl;
+    cout << "**" << endl;
+    cout << "Option (1 - 4): ";
+    cin >> option;
+    switch (option) {
+    case 1:; break;
+    case 2: song(); break;
+    case 3:; break;
+    case 4: break;
+    default:
+        cout << "No such option " << option << endl;
+        break;
+    }
+
+
+
+}
+int main() {
+    vector<Gift> gifts;
+    vector<Customer> customers;
+    vector<Transaction> transactions;
+    string lastdata = "no last data";
+
+    int choice;
+    bool exitProgram = true, readytostart = true;
+
+    while (exitProgram) {
+        cout << "\n\n";
+        cout << "Welcome Message designed by your group" << endl;
+        cout << "*** Main Menu ***" << endl;
+        cout << "[1] Load Starting Data" << endl;
+        cout << "[2] Show Records" << endl;
+        cout << "[3] Edit Customers" << endl;
+        cout << "[4] Enter Customer View" << endl;
+        cout << "[5] Show Transaction History" << endl;
+        cout << "[6] Credits and Exit" << endl;
+        cout << "[7] Creative" << endl;
+        cout << "*****************" << endl;
+        cout << "\n\n";
+        cout << "Option (1 - 7): ";
+        cout << "\n\n";
+        cin >> choice;
+        switch (choice) {
+        case 1:
+            loadData(gifts, customers);
+            readytostart = false;
+            break;
+        case 2:
+            if (readytostart) {
+                cout << "option one first";
+            }
+            else
+                showRecords(gifts, customers);
+            break;
+        case 3:
+            if (readytostart) {
+                cout << "option one first";
+            }
+            else
+                editCustomers(customers);
+            break;
+        case 4:
+
+            if (readytostart) {
+                cout << "option one first";
+            }
+            else
+                customerView(customers, transactions, gifts);
+
+            break;
+        case 5:
+            if (readytostart) {
+                cout << "option one first";
+            }
+            else
+                showTransactionHistory(transactions, customers);
+            break;
+        case 6:
+
+            if (creditsAndExit() == 1) {
+
+                exitProgram = false;
+                break;
+            }
+            else
+                break;
+        case 7:
+            if (readytostart) {
+                cout << "option one first";
+            }
+            else
+                creative();
+            break;
+
+
+
+        default:
+            cout << "Invalid option, please try again." << endl;
+            break;
+        }
+    }
+
+    return 0;
+}
